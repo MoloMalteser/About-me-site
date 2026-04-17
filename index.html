@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marlin | Uncensored</title>
+    
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- TOPBAR --- */
+        .topbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .burger {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .burger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: #fff;
+            transition: 0.3s;
+        }
+
+        /* --- NAVBAR (Hidden by default) --- */
+        .navbar {
+            position: fixed;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            transition: 0.5s ease-in-out;
+            z-index: 999;
+            backdrop-filter: blur(20px);
+        }
+
+        .navbar.active {
+            top: 60px;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .navbar a:hover { color: #888; }
+
+        /* --- SCROLL SECTIONS --- */
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 3rem 5rem;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 80%;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 5rem);
+            font-weight: 700;
+        }
+
+        /* --- liquidGL Lens --- */
+        .shape {
+            position: fixed;
+            top: 15vh;
+            left: 10vw;
+            width: 80vw;
+            height: 70vh;
+            border-radius: 40px;
+            pointer-events: none;
+            z-index: 500;
+            transform: scale(0.8);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="logo">uncensored</div>
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <nav class="navbar" id="nav">
+        <a href="#home">Home</a>
+        <a href="#projects">Projects</a>
+        <a href="#socials">Social Links</a>
+    </nav>
+
+    <main>
+        <section id="home">
+            <div class="glass-card scroll-reveal">
+                <h1>Hey 👋</h1>
+            </div>
+        </section>
+
+        <section>
+            <div class="glass-card scroll-reveal">
+                <h1>I’m Marlin</h1>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="glass-card scroll-reveal">
+                <h1>I’m a Mobile App Developer</h1>
+            </div>
+        </section>
+
+        <section id="socials">
+            <div class="glass-card scroll-reveal">
+                <h1>And a Student</h1>
+            </div>
+        </section>
+    </main>
+
+    <div class="shape liquidGL"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+    <script src="/scripts/liquidGL.js"></script>
+
+    <script>
+        // Burger Menu Logik
+        const burger = document.getElementById('burger');
+        const nav = document.getElementById('nav');
+        burger.onclick = () => nav.classList.toggle('active');
+
+        // GSAP Scroll Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.querySelectorAll('.scroll-reveal').forEach((card) => {
+            gsap.to(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "top 20%",
+                    toggleActions: "play reverse play reverse"
+                },
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power4.out"
+            });
+        });
+
+        // liquidGL Initialisierung (Basierend auf deinem Repo-Code)
+        window.addEventListener('DOMContentLoaded', () => {
+            const glassEffect = liquidGL({
+                target: ".liquidGL",
+                snapshot: "body",
+                refraction: 0.025,
+                bevelDepth: 0.1,
+                bevelWidth: 0.05,
+                frost: 0.2,
+                shadow: true,
+                on: {
+                    init: (intro) => {
+                        gsap.to(intro.el, {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 2,
+                            ease: "expo.out"
+                        });
+                    }
+                }
+            });
+
+            // Registriere die Glas-Karten für den Refraktions-Effekt
+            liquidGL.registerDynamic(".glass-card");
+            liquidGL.syncWith();
+        });
+    </script>
+</body>
+</html>
