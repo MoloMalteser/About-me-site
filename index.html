@@ -2,165 +2,164 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Marlin | App Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Marlin | iOS Style</title>
     
     <style>
         :root {
             --bg: #050508;
-            --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #f53d83;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
         body {
             background-color: var(--bg);
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            overflow-x: hidden;
+            font-family: -apple-system, system-ui, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
         }
 
-        /* Hintergrund Blobs */
-        .blob-container {
+        /* Hintergrund-Layer */
+        #bg-layer {
             position: fixed;
             inset: 0;
-            z-index: 1; /* Muss hinter dem Glas, aber vor dem schwarzen Hintergrund sein */
-            filter: blur(80px);
+            z-index: 1;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050508 100%);
         }
+
         .blob {
             position: absolute;
-            width: 60vw;
-            height: 60vw;
+            width: 80vw;
+            height: 80vw;
+            filter: blur(100px);
+            opacity: 0.4;
             border-radius: 50%;
-            opacity: 0.5;
+            z-index: 2;
         }
 
-        /* Content Wrapper */
-        .app-wrapper {
+        /* Content-Layer */
+        .content {
             position: relative;
             z-index: 10;
-            padding: 20px;
-            padding-bottom: 120px;
-            max-width: 500px;
+            padding: 60px 25px;
+            max-width: 450px;
             margin: 0 auto;
-            min-height: 100vh;
         }
 
-        header { padding: 40px 0 20px; }
-        h1 { font-size: 2.5rem; font-weight: 800; }
-        .subtitle { color: #888; font-size: 1.1rem; }
+        h1 { font-size: 3rem; margin: 0; }
+        .sub { color: #888; font-size: 1.2rem; margin-bottom: 40px; }
 
-        /* Glass Panel */
-        .glass-panel {
-            background: var(--glass);
+        /* Das Glas-Panel */
+        #glass-panel {
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            padding: 25px;
-            margin-top: 30px;
-            /* Wichtig für liquidGL: Sichtbarkeit sicherstellen */
-            backdrop-filter: blur(0px); 
+            border-radius: 30px;
+            padding: 30px;
+            min-height: 150px;
+            position: relative;
+            /* WICHTIG: Kein opacity:0 hier, sonst sieht html2canvas nichts! */
         }
 
-        /* Navbar */
-        .nav-container {
+        /* Navbar - Echte Assets Pfade */
+        .nav {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 400px;
-            z-index: 1000;
-        }
-        .nav-bar {
-            background: rgba(20, 20, 25, 0.6);
-            backdrop-filter: blur(20px);
+            background: rgba(20, 20, 25, 0.7);
+            backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border);
             border-radius: 40px;
             display: flex;
             justify-content: space-around;
-            padding: 12px;
+            padding: 15px;
+            z-index: 1000;
         }
-        .nav-btn { color: #666; cursor: pointer; text-align: center; flex: 1; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-icon { font-size: 22px; display: block; }
-        .nav-btn span { font-size: 10px; font-weight: 600; }
 
-        .jiggle { animation: jiggle-anim 0.4s ease-out; }
-        @keyframes jiggle-anim {
+        .nav-item {
+            text-align: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto 5px;
+            filter: grayscale(1);
+        }
+
+        .nav-item.active { color: var(--accent); }
+        .nav-item.active img { filter: grayscale(0) drop-shadow(0 0 5px var(--accent)); }
+
+        .jiggle { animation: jiggle 0.4s ease; }
+        @keyframes jiggle {
             0% { transform: scale(1); }
-            30% { transform: scale(1.4) rotate(8deg); }
+            50% { transform: scale(1.3); }
             100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <div class="blob-container" id="bg-blobs">
-        <div class="blob" style="background: #f53d83; top: -10%; right: -10%;"></div>
-        <div class="blob" style="background: #4400ff; bottom: 20%; left: -20%;"></div>
+    <div id="bg-layer">
+        <div class="blob" style="background: #f53d83; top: -10%; left: -20%;"></div>
+        <div class="blob" style="background: #4400ff; bottom: -10%; right: -20%;"></div>
     </div>
 
-    <div class="app-wrapper">
-        <header>
-            <h1>Marlin</h1>
-            <p class="subtitle">Mobile App Developer</p>
-        </header>
+    <div class="content">
+        <h1>Marlin</h1>
+        <div class="sub">Mobile App Developer</div>
 
-        <div class="glass-panel" id="main-glass">
-            <h2 style="margin-bottom: 10px;">Status</h2>
-            <p>System bereit für liquidGL Integration. Alle Dateien im Git vorhanden.</p>
+        <div id="glass-panel">
+            <h2 style="margin:0 0 10px 0;">Status</h2>
+            <p style="color:#aaa; margin:0;">liquidGL ist aktiv. Hintergrund wird gebrochen.</p>
         </div>
     </div>
 
-    <div class="nav-container">
-        <div class="nav-bar">
-            <div class="nav-btn active" onclick="navAction(this)">
-                <span class="nav-icon">🏠</span><span>Home</span>
-            </div>
-            <div class="nav-btn" onclick="navAction(this)">
-                <span class="nav-icon">⏹</span><span>Apps</span>
-            </div>
-            <div class="nav-btn" onclick="navAction(this)">
-                <span class="nav-icon">📡</span><span>Social</span>
-            </div>
-        </div>
-    </div>
+    <nav class="nav">
+        <a href="#" class="nav-item active" onclick="clickNav(this)">
+            <img src="/assets/home.svg" alt="Home"> Home
+        </a>
+        <a href="#" class="nav-item" onclick="clickNav(this)">
+            <img src="/assets/apps.svg" alt="Apps"> Apps
+        </a>
+        <a href="#" class="nav-item" onclick="clickNav(this)">
+            <img src="/assets/social.svg" alt="Social"> Social
+        </a>
+    </nav>
 
     <script src="/scripts/html2canvas.min.js"></script>
     <script src="/scripts/liquidGL.js"></script>
 
     <script>
-        function navAction(el) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        function clickNav(el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            const icon = el.querySelector('.nav-icon');
-            icon.classList.add('jiggle');
-            setTimeout(() => icon.classList.remove('jiggle'), 400);
+            el.querySelector('img').classList.add('jiggle');
+            setTimeout(() => el.querySelector('img').classList.remove('jiggle'), 400);
         }
 
-        window.addEventListener('load', () => {
-            // Erst wenn alles geladen ist (Bilder, Styles)
+        // Wir warten, bis alles (auch die SVGs) geladen ist
+        window.onload = () => {
             setTimeout(() => {
-                try {
-                    liquidGL({
-                        target: "#main-glass",
-                        snapshot: "#bg-blobs", // Er nimmt nur die bunten Blobs als Hintergrund für das Glas
-                        refraction: 0.04,
-                        frost: 0.1,
-                        bevelDepth: 0.1,
-                        bevelWidth: 0.1,
-                        shadow: true,
-                        tilt: true,
-                        tiltFactor: 10
-                    });
-                    console.log("liquidGL erfolgreich geladen");
-                } catch (e) {
-                    console.error("Fehler beim Initialisieren:", e);
-                }
-            }, 100); // Kleiner Delay für das Rendering-Engine
-        });
+                const glass = liquidGL({
+                    target: "#glass-panel",
+                    snapshot: "#bg-layer", // NUR den Hintergrund fotografieren!
+                    refraction: 0.05,
+                    frost: 0.12,
+                    bevelDepth: 0.1,
+                    shadow: true,
+                    tilt: true
+                });
+            }, 300); // Kleiner Puffer für mobile Browser
+        };
     </script>
 </body>
 </html>
