@@ -1,239 +1,175 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Marlin | Uncensored</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiquidGL | Bio-Premium Pro</title>
     
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
+            --bg: #0a0a0c;
+            --accent: #6366f1;
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow: hidden; /* Scrollen passiert im Container */
         }
 
-        body {
-            background-color: #000;
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
+        /* 1. TOP NAVBAR */
+        .top-nav {
+            position: fixed; top: 0; width: 100%; height: 60px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; z-index: 1000;
+            background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border); box-sizing: border-box;
         }
+        .logo { height: 30px; }
 
-        /* --- TOPBAR --- */
-        .topbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .burger {
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .burger span {
-            display: block;
-            width: 25px;
-            height: 2px;
-            background: #fff;
-            transition: 0.3s;
-        }
-
-        /* --- NAVBAR (Hidden by default) --- */
-        .navbar {
-            position: fixed;
-            top: -100%;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            transition: 0.5s ease-in-out;
-            z-index: 999;
-            backdrop-filter: blur(20px);
-        }
-
-        .navbar.active {
-            top: 60px;
-        }
-
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .navbar a:hover { color: #888; }
-
-        /* --- SCROLL SECTIONS --- */
-        section {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+        /* 2. LAYOUT: LINKS CONTENT, RECHTS LOGIN/INFO */
+        .split-layout { display: flex; width: 100%; height: 100vh; padding-top: 60px; }
+        
+        #left-col { 
+            width: 50%; height: calc(100vh - 60px); 
+            overflow-y: auto; scrollbar-width: none; 
             position: relative;
         }
+        #left-col::-webkit-scrollbar { display: none; }
 
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
+        .right-col { 
+            width: 50%; height: 100%; 
+            background: #fff; color: #000;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 3. DAS ZENTRALE GLAS-VIERECK (Fixiert im linken Bereich) */
+        .glass-anchor {
+            position: fixed; top: 60px; left: 0; width: 50%; height: calc(100vh - 60px);
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none; z-index: 500; mix-blend-mode: difference;
+        }
+
+        .bio-card-glass {
+            width: 360px; height: 480px; border-radius: 30px;
             border: 1px solid var(--glass-border);
-            padding: 3rem 5rem;
-            border-radius: 24px;
-            text-align: center;
-            max-width: 80%;
-            opacity: 0;
-            transform: translateY(50px);
+            pointer-events: auto; display: flex; flex-direction: column;
+            padding: 30px; box-sizing: border-box; text-align: center;
         }
 
-        h1 {
-            font-size: clamp(2rem, 8vw, 5rem);
-            font-weight: 700;
+        /* 4. BOTTOM TABBAR MIT JIGGLE */
+        .bottom-tabs {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px; border-radius: 50px;
+            display: flex; gap: 20px; z-index: 600;
         }
 
-        /* --- liquidGL Lens --- */
-        .shape {
-            position: fixed;
-            top: 15vh;
-            left: 10vw;
-            width: 80vw;
-            height: 70vh;
-            border-radius: 40px;
-            pointer-events: none;
-            z-index: 500;
-            transform: scale(0.8);
-            opacity: 0;
+        .tab-item {
+            cursor: pointer; font-size: 20px; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        /* Jiggle Animation */
+        .jiggle { animation: jiggle-anim 0.4s ease-in-out; }
+        @keyframes jiggle-anim {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3) rotate(10deg); }
+            60% { transform: scale(0.9) rotate(-10deg); }
+            100% { transform: scale(1); }
+        }
+
+        /* Background Elements */
+        .content-img { width: 100%; height: 100vh; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <div class="topbar">
-        <div class="logo">uncensored</div>
-        <div class="burger" id="burger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="top-nav">
+        <img src="/assets/ndlogo.svg" class="logo" alt="Logo">
+        <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px;">PREMIUM ACCESS</div>
+        <div style="width: 30px;"></div>
+    </nav>
+
+    <div class="split-layout">
+        <div id="left-col">
+            <img src="/assets/liquid-bkg-_0000_Comp-33.webp" class="content-img">
+            <img src="/assets/liquid-bkg-_0001_Comp-183.webp" class="content-img">
+            <img src="/assets/liquid-bkg-_0002_Comp-163.webp" class="content-img">
+
+            <div class="glass-anchor">
+                <div class="bio-card-glass">
+                    <h2 style="margin-top: 40px;">BIO CARD</h2>
+                    <p style="opacity: 0.6;">Scroll down to see refraction</p>
+                    
+                    <div style="margin-top: auto;">
+                        <div style="font-size: 10px; opacity: 0.5; margin-bottom: 5px;">STATUS</div>
+                        <div style="font-weight: bold;">ENCRYPTED</div>
+                    </div>
+
+                    <div class="bottom-tabs">
+                        <div class="tab-item" onclick="jiggle(this)">🏠</div>
+                        <div class="tab-item" onclick="jiggle(this)">🔍</div>
+                        <div class="tab-item" onclick="jiggle(this)">👤</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div style="padding: 40px; text-align: center;">
+                <img src="/assets/ndlogo.svg" style="height: 60px; filter: invert(1);">
+                <h1>liquidGL</h1>
+                <p>High Performance WebGL Glassmorphism</p>
+                <button style="padding: 15px 40px; border-radius: 50px; border: none; background: #000; color: #fff; cursor: pointer; font-weight: bold;">Unlock Now</button>
+            </div>
         </div>
     </div>
 
-    <nav class="navbar" id="nav">
-        <a href="#home">Home</a>
-        <a href="#projects">Projects</a>
-        <a href="#socials">Social Links</a>
-    </nav>
-
-    <main>
-        <section id="home">
-            <div class="glass-card scroll-reveal">
-                <h1>Hey 👋</h1>
-            </div>
-        </section>
-
-        <section>
-            <div class="glass-card scroll-reveal">
-                <h1>I’m Marlin</h1>
-            </div>
-        </section>
-
-        <section id="projects">
-            <div class="glass-card scroll-reveal">
-                <h1>I’m a Mobile App Developer</h1>
-            </div>
-        </section>
-
-        <section id="socials">
-            <div class="glass-card scroll-reveal">
-                <h1>And a Student</h1>
-            </div>
-        </section>
-    </main>
-
-    <div class="shape liquidGL"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="/scripts/html2canvas.min.js"></script>
     <script src="/scripts/liquidGL.js"></script>
 
     <script>
-        // Burger Menu Logik
-        const burger = document.getElementById('burger');
-        const nav = document.getElementById('nav');
-        burger.onclick = () => nav.classList.toggle('active');
+        function jiggle(el) {
+            el.classList.remove('jiggle');
+            void el.offsetWidth; // Trigger reflow
+            el.classList.add('jiggle');
+        }
 
-        // GSAP Scroll Animations
-        gsap.registerPlugin(ScrollTrigger);
-
-        document.querySelectorAll('.scroll-reveal').forEach((card) => {
-            gsap.to(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 80%",
-                    end: "top 20%",
-                    toggleActions: "play reverse play reverse"
-                },
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power4.out"
-            });
-        });
-
-        // liquidGL Initialisierung (Basierend auf deinem Repo-Code)
-        window.addEventListener('DOMContentLoaded', () => {
-            const glassEffect = liquidGL({
-                target: ".liquidGL",
-                snapshot: "body",
-                refraction: 0.025,
-                bevelDepth: 0.1,
-                bevelWidth: 0.05,
-                frost: 0.2,
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. liquidGL Setup
+            const glass = liquidGL({
+                target: ".bio-card-glass",
+                snapshot: "#left-col", // Wichtig: Woher das Bild für das Glas kommt
+                frost: 1.5,
+                refraction: 0.04,
+                bevelWidth: 0.15,
+                bevelDepth: 0.12,
+                tilt: true,
+                tiltFactor: 15,
                 shadow: true,
-                on: {
-                    init: (intro) => {
-                        gsap.to(intro.el, {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 2,
-                            ease: "expo.out"
-                        });
-                    }
-                }
+                specular: true
             });
 
-            // Registriere die Glas-Karten für den Refraktions-Effekt
-            liquidGL.registerDynamic(".glass-card");
-            liquidGL.syncWith();
+            // 2. Lenis Smooth Scroll
+            const lenis = new Lenis({
+                wrapper: document.querySelector("#left-col"),
+                content: document.querySelector("#left-col")
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+            // 3. Sync LiquidGL mit Scrollen
+            liquidGL.syncWith({ lenis: lenis });
         });
     </script>
 </body>
