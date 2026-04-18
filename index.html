@@ -3,169 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Marlin | Liquid Experience</title>
+    <title>iOS Watch Clone | Marlin</title>
     
     <style>
         :root {
-            --bg: #050508;
-            --accent: #f53d83;
-            --glass-stroke: rgba(255, 255, 255, 0.15);
+            --ios-bg: #000000;
+            --ios-grey: #1c1c1e;
+            --ios-text: #ffffff;
+            --ios-subtext: #8e8e93;
+            --ios-accent: #ff9f0a; /* Watch App Orange */
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body {
-            background-color: var(--bg);
-            color: white;
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        /* --- HEADER AREA --- */
+        .header {
+            padding: 60px 16px 20px;
+            background: var(--ios-bg);
+        }
+
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .search-bar {
+            background: #1c1c1e;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-top: 15px;
+            color: var(--ios-subtext);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- LIST STYLE (iOS Settings Look) --- */
+        .settings-group {
+            background: var(--ios-grey);
+            border-radius: 10px;
+            margin: 20px 16px;
             overflow: hidden;
-            height: 100vh;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 15px;
+            border-bottom: 0.5px solid #38383a;
+            cursor: pointer;
+        }
+
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:active { background-color: #3a3a3c; }
+
+        .icon-box {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .label { flex: 1; font-size: 17px; }
+        .chevron { color: #3a3a3c; font-weight: bold; }
+
+        /* --- TABBAR (LiquidGL Target) --- */
+        .tabbar-container {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 400px;
+            z-index: 9999;
+        }
+
+        #ios-tabbar {
+            background: rgba(28, 28, 30, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 0.5px solid var(--glass-border);
+            border-radius: 35px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            padding: 8px 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .tab-item {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-subtext);
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        /* --- BACKGROUND LAYER (Refraction Source) --- */
-        #stage-bg {
+        .tab-item.active { color: var(--ios-accent); }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tab-label { font-size: 10px; font-weight: 500; }
+
+        /* Jiggle / Elastic Animation */
+        .jiggle .tab-icon {
+            animation: spring 0.5s ease-in-out;
+        }
+
+        @keyframes spring {
+            0% { transform: scale(1) translateY(0); }
+            30% { transform: scale(1.4) translateY(-8px); }
+            50% { transform: scale(0.9) translateY(2px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        /* Hintergrund Blobs für LiquidGL Brechung */
+        .bg-gradient {
             position: fixed;
             inset: 0;
-            z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #12121a 0%, #050508 100%);
+            z-index: -1;
+            background: radial-gradient(circle at 80% 20%, #2c1a05 0%, #000 60%);
         }
-
-        .ambient-light {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.6;
-            z-index: 2;
-        }
-
-        /* --- CONTENT LAYER --- */
-        .ui-main {
-            position: relative;
-            z-index: 10;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 60px 30px;
-            pointer-events: none;
-        }
-
-        .header h1 { 
-            font-size: 3.5rem; 
-            font-weight: 800; 
-            letter-spacing: -2px; 
-            margin-bottom: 5px;
-            background: linear-gradient(to bottom, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* --- THE GLASS PANEL (Target) --- */
-        .glass-view {
-            width: 100%;
-            max-width: 400px;
-            height: 280px;
-            margin: auto;
-            border-radius: 45px; /* Wie in deinen Inspirationsbildern */
-            border: 1px solid var(--glass-stroke);
-            position: relative;
-            pointer-events: auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 40px;
-            /* liquidGL übernimmt das Rendering hier */
-        }
-
-        .glass-inner-text {
-            position: relative;
-            z-index: 20;
-        }
-
-        /* --- MODERN TABBAR (Apple Style) --- */
-        .dock-wrapper {
-            position: fixed;
-            bottom: 40px;
-            left: 0; width: 100%;
-            display: flex; justify-content: center;
-            z-index: 100;
-        }
-
-        .dock {
-            width: 92%; max-width: 420px;
-            background: rgba(30, 30, 35, 0.7);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border-radius: 40px;
-            border: 0.5px solid var(--glass-stroke);
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .tab {
-            display: flex; flex-direction: column; align-items: center;
-            color: #8e8e93; font-size: 10px; font-weight: 600;
-            text-decoration: none; cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .tab.active { color: #fff; }
-
-        .tab img {
-            width: 28px; height: 28px; margin-bottom: 4px;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Jiggle Animation von deinem Video */
-        .jiggle { animation: jiggle-effect 0.5s ease; }
-        @keyframes jiggle-effect {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.4) rotate(10deg); }
-            50% { transform: scale(0.9) rotate(-10deg); }
-            100% { transform: scale(1); }
-        }
-
     </style>
 </head>
 <body>
 
-    <div id="stage-bg">
-        <div class="ambient-light" style="background: #f53d83; width: 350px; height: 350px; top: 15%; right: -50px;"></div>
-        <div class="ambient-light" style="background: #5e5ce6; width: 450px; height: 450px; bottom: 10%; left: -100px;"></div>
-        <div class="ambient-light" style="background: #00f2ff; width: 250px; height: 250px; top: 40%; left: 20%; opacity: 0.3;"></div>
+    <div class="bg-gradient"></div>
+
+    <div class="header">
+        <h1>Marlin's Watch</h1>
+        <div class="search-bar">🔍 Einstellungen durchsuchen</div>
     </div>
 
-    <main class="ui-main">
-        <div class="header" style="pointer-events: auto;">
-            <h1>Marlin</h1>
-            <p style="color: rgba(255,255,255,0.5);">Interface Designer</p>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="icon-box" style="background: #ff3b30;">🔔</div>
+            <div class="label">Mitteilungen</div>
+            <div class="chevron">›</div>
         </div>
+        <div class="settings-item">
+            <div class="icon-box" style="background: #ff9500;">⌚</div>
+            <div class="label">App-Ansicht</div>
+            <div class="chevron">›</div>
+        </div>
+        <div class="settings-item">
+            <div class="icon-box" style="background: #8e8e93;">⚙️</div>
+            <div class="label">Allgemein</div>
+            <div class="chevron">›</div>
+        </div>
+    </div>
 
-        <div class="glass-view" id="liquid-glass">
-            <div class="glass-inner-text">
-                <h2 style="font-size: 24px; margin-bottom: 10px;">Experience</h2>
-                <p style="color: rgba(255,255,255,0.7); line-height: 1.4;">Dieses Panel nutzt liquidGL für reale Lichtbrechung, inspiriert von iOS 26 Entwürfen.</p>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="icon-box" style="background: #007aff;">✨</div>
+            <div class="label">Anzeige & Helligkeit</div>
+            <div class="chevron">›</div>
+        </div>
+    </div>
+
+    <div class="tabbar-container">
+        <nav id="ios-tabbar">
+            <div class="tab-item active" onclick="triggerTab(this)">
+                <div class="tab-icon">⌚</div>
+                <div class="tab-label">Meine Uhr</div>
             </div>
-        </div>
-    </main>
-
-    <div class="dock-wrapper">
-        <nav class="dock">
-            <a href="#" class="tab active" onclick="triggerNav(this)">
-                <img src="/assets/home.svg" alt="Home"><span>Home</span>
-            </a>
-            <a href="#" class="tab" onclick="triggerNav(this)">
-                <img src="/assets/apps.svg" alt="New"><span>New</span>
-            </a>
-            <a href="#" class="tab" onclick="triggerNav(this)">
-                <img src="/assets/radio.svg" alt="Radio"><span>Radio</span>
-            </a>
-            <a href="#" class="tab" onclick="triggerNav(this)">
-                <img src="/assets/library.svg" alt="Library"><span>Library</span>
-            </a>
+            <div class="tab-item" onclick="triggerTab(this)">
+                <div class="tab-icon">🎨</div>
+                <div class="tab-label">Zifferblätter</div>
+            </div>
+            <div class="tab-item" onclick="triggerTab(this)">
+                <div class="tab-icon">🧭</div>
+                <div class="tab-label">Entdecken</div>
+            </div>
         </nav>
     </div>
 
@@ -173,32 +203,35 @@
     <script src="/scripts/liquidGL.js"></script>
 
     <script>
-        function triggerNav(el) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // Tab Logik & Animation
+        function triggerTab(el) {
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.remove('jiggle');
+            });
             el.classList.add('active');
+            el.classList.add('jiggle');
             
-            const img = el.querySelector('img');
-            img.classList.remove('jiggle');
-            void img.offsetWidth; // Trigger reflow
-            img.classList.add('jiggle');
+            // Haptik-Simulation (Vibration falls unterstützt)
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
         }
 
+        // LiquidGL Initialisierung (1:1 iOS Glas-Look)
         window.addEventListener('load', () => {
-            // liquidGL Init mit Fokus auf deine "Linsen"-Inspiration
             setTimeout(() => {
                 liquidGL({
-                    target: "#liquid-glass",
-                    snapshot: "#stage-bg", // Er nimmt die Blobs als Brechungsgrundlage
-                    refraction: 0.08,      // Höhere Brechung für den "Linseneffekt"
-                    frost: 0.05,           // Wenig Frost für klares Glas
-                    bevelWidth: 0.15,      // Dickere Kante wie in den Bildern
-                    bevelDepth: 0.15,      // Tiefe der Kante
-                    shadow: true,          // Schatten unter dem Glas
-                    specular: true,        // Lichtreflexion auf der Oberfläche
-                    tilt: true,            // Maus/Touch Neigung
-                    tiltFactor: 15
+                    target: "#ios-tabbar",
+                    snapshot: "body",      // Er nimmt alles dahinter für die Brechung
+                    refraction: 0.03,      // iOS-typische leichte Brechung
+                    frost: 0.15,           // Edles Milchglas-Finish
+                    bevelWidth: 0.1,
+                    bevelDepth: 0.08,
+                    shadow: true,
+                    specular: true,        // Für das Licht-Highlight auf dem Glas
+                    tilt: true,            // Reagiert auf Neigung/Maus
+                    tiltFactor: 8
                 });
-            }, 300);
+            }, 500);
         });
     </script>
 </body>
