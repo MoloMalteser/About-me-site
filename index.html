@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Marlin | Pro Glass</title>
+    <title>Marlin | App Experience</title>
     
     <style>
         :root {
             --bg: #050508;
             --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --accent: #ffffff;
-            --subtext: #86868b;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #f53d83;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -21,160 +20,110 @@
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        /* --- BACKGROUND DYNAMICS --- */
-        .orb-bg {
-            position: fixed; inset: 0; z-index: -1; filter: blur(100px);
+        /* Hintergrund Blobs */
+        .blob-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1; /* Muss hinter dem Glas, aber vor dem schwarzen Hintergrund sein */
+            filter: blur(80px);
         }
-        .orb {
-            position: absolute; width: 60vw; height: 60vw; border-radius: 50%; opacity: 0.4;
-            animation: move 25s infinite alternate ease-in-out;
-        }
-
-        @keyframes move {
-            0% { transform: translate(-10%, -10%); }
-            100% { transform: translate(30%, 20%); }
-        }
-
-        /* --- CONTENT --- */
-        main {
-            width: 100%;
-            max-width: 440px;
-            padding: 80px 20px 140px;
-        }
-
-        /* --- SELECTION PILL (Segmented Control) --- */
-        .pill-container {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            padding: 4px;
-            border-radius: 20px;
-            display: flex;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        .pill-item {
-            flex: 1;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--subtext);
-            cursor: pointer;
-            z-index: 2;
-            transition: color 0.3s;
-        }
-        .pill-item.active { color: white; }
-        
-        .pill-selector {
+        .blob {
             position: absolute;
-            top: 4px; left: 4px;
-            width: calc(33.33% - 4px);
-            height: calc(100% - 8px);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: 1;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            opacity: 0.5;
         }
 
-        /* --- GLASS CARDS --- */
-        .glass-card {
+        /* Content Wrapper */
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            padding-bottom: 120px;
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        header { padding: 40px 0 20px; }
+        h1 { font-size: 2.5rem; font-weight: 800; }
+        .subtitle { color: #888; font-size: 1.1rem; }
+
+        /* Glass Panel */
+        .glass-panel {
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 28px;
-            padding: 24px;
-            margin-bottom: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            /* Wichtig für liquidGL: Sichtbarkeit sicherstellen */
+            backdrop-filter: blur(0px); 
         }
 
-        h1 { font-size: 34px; font-weight: 700; margin-bottom: 5px; }
-        .subtitle { color: var(--subtext); margin-bottom: 30px; }
-
-        /* --- NAVBAR --- */
-        .nav-anchor {
+        /* Navbar */
+        .nav-container {
             position: fixed;
             bottom: 30px;
-            width: calc(100% - 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
             max-width: 400px;
             z-index: 1000;
         }
-        .nav-glass {
-            background: rgba(255, 255, 255, 0.02);
+        .nav-bar {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 35px;
+            border-radius: 40px;
             display: flex;
             justify-content: space-around;
             padding: 12px;
-            position: relative;
         }
+        .nav-btn { color: #666; cursor: pointer; text-align: center; flex: 1; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-icon { font-size: 22px; display: block; }
+        .nav-btn span { font-size: 10px; font-weight: 600; }
 
-        .nav-btn {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--subtext); cursor: pointer; transition: 0.3s;
-        }
-        .nav-btn.active { color: white; }
-        .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
-        .nav-btn span { font-size: 10px; font-weight: 500; }
-
-        /* Jiggle Animation */
-        @keyframes jiggle {
+        .jiggle { animation: jiggle-anim 0.4s ease-out; }
+        @keyframes jiggle-anim {
             0% { transform: scale(1); }
-            40% { transform: scale(1.2) translateY(-5px); }
-            70% { transform: scale(0.9); }
+            30% { transform: scale(1.4) rotate(8deg); }
             100% { transform: scale(1); }
         }
-        .jiggle { animation: jiggle 0.4s ease-out; }
-
     </style>
 </head>
 <body>
 
-    <div class="orb-bg">
-        <div class="orb" style="background: #4400ff; top: -10%; left: -10%;"></div>
-        <div class="orb" style="background: #ff0055; bottom: 10%; right: -10%; animation-delay: -5s;"></div>
+    <div class="blob-container" id="bg-blobs">
+        <div class="blob" style="background: #f53d83; top: -10%; right: -10%;"></div>
+        <div class="blob" style="background: #4400ff; bottom: 20%; left: -20%;"></div>
     </div>
 
-    <main>
+    <div class="app-wrapper">
         <header>
             <h1>Marlin</h1>
             <p class="subtitle">Mobile App Developer</p>
         </header>
 
-        <div class="pill-container glass-pill-target">
-            <div class="pill-selector" id="pill-selector"></div>
-            <div class="pill-item active" onclick="movePill(0, this)">Overview</div>
-            <div class="pill-item" onclick="movePill(1, this)">Projects</div>
-            <div class="pill-item" onclick="movePill(2, this)">About</div>
+        <div class="glass-panel" id="main-glass">
+            <h2 style="margin-bottom: 10px;">Status</h2>
+            <p>System bereit für liquidGL Integration. Alle Dateien im Git vorhanden.</p>
         </div>
+    </div>
 
-        <div class="glass-card liquid-target">
-            <h3 style="margin-bottom: 10px;">Status</h3>
-            <p style="color: var(--subtext); font-size: 14px;">Aktuell fokussiert auf High-End WebGL Interfaces.</p>
-        </div>
-
-        <div class="glass-card liquid-target" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-            <p style="opacity: 0.2;">Content Area</p>
-        </div>
-    </main>
-
-    <div class="nav-anchor">
-        <div class="nav-glass navbar-liquid">
-            <div class="nav-btn active" onclick="handleNav(this)">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span>Home</span>
+    <div class="nav-container">
+        <div class="nav-bar">
+            <div class="nav-btn active" onclick="navAction(this)">
+                <span class="nav-icon">🏠</span><span>Home</span>
             </div>
-            <div class="nav-btn" onclick="handleNav(this)">
-                <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
-                <span>Apps</span>
+            <div class="nav-btn" onclick="navAction(this)">
+                <span class="nav-icon">⏹</span><span>Apps</span>
             </div>
-            <div class="nav-btn" onclick="handleNav(this)">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                <span>Social</span>
+            <div class="nav-btn" onclick="navAction(this)">
+                <span class="nav-icon">📡</span><span>Social</span>
             </div>
         </div>
     </div>
@@ -183,53 +132,34 @@
     <script src="/scripts/liquidGL.js"></script>
 
     <script>
-        // Auswahlpille Logik
-        function movePill(index, el) {
-            const selector = document.getElementById('pill-selector');
-            selector.style.transform = `translateX(${index * 100}%)`;
-            
-            document.querySelectorAll('.pill-item').forEach(item => item.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        // Navbar Logik & Jiggle
-        function handleNav(el) {
+        function navAction(el) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            
-            el.classList.remove('jiggle');
-            void el.offsetWidth;
-            el.classList.add('jiggle');
+            const icon = el.querySelector('.nav-icon');
+            icon.classList.add('jiggle');
+            setTimeout(() => icon.classList.remove('jiggle'), 400);
         }
 
-        // liquidGL
-        window.addEventListener('DOMContentLoaded', () => {
-            // Die Haupt-Karten
-            liquidGL({
-                target: ".liquid-target",
-                snapshot: ".orb-bg",
-                refraction: 0.04,
-                frost: 0.1,
-                bevelWidth: 0.1,
-                tilt: true
-            });
-
-            // Die Navbar - extra glasig
-            liquidGL({
-                target: ".navbar-liquid",
-                snapshot: ".orb-bg",
-                refraction: 0.02,
-                frost: 0.4,
-                bevelWidth: 0.2,
-                shadow: true
-            });
-
-            // Die Auswahlpille
-            liquidGL({
-                target: ".glass-pill-target",
-                refraction: 0.01,
-                frost: 0.6
-            });
+        window.addEventListener('load', () => {
+            // Erst wenn alles geladen ist (Bilder, Styles)
+            setTimeout(() => {
+                try {
+                    liquidGL({
+                        target: "#main-glass",
+                        snapshot: "#bg-blobs", // Er nimmt nur die bunten Blobs als Hintergrund für das Glas
+                        refraction: 0.04,
+                        frost: 0.1,
+                        bevelDepth: 0.1,
+                        bevelWidth: 0.1,
+                        shadow: true,
+                        tilt: true,
+                        tiltFactor: 10
+                    });
+                    console.log("liquidGL erfolgreich geladen");
+                } catch (e) {
+                    console.error("Fehler beim Initialisieren:", e);
+                }
+            }, 100); // Kleiner Delay für das Rendering-Engine
         });
     </script>
 </body>
